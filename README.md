@@ -32,6 +32,6 @@ npm run build    # Create the production files in dist/
 npm run preview  # Preview the production build locally
 ```
 
-The project configuration is in `firebase-applet-config.json`. This app does not currently read `GEMINI_API_KEY` during local startup, so `.env.local` is not required to run it.
+Copy `.env.example` to `.env.local` for local development and fill in the Firebase `VITE_FIREBASE_*` values. In Vercel, add the same variables under **Project Settings > Environment Variables** for Preview and Production. Do not commit `.env.local`.
 
 If npm reports missing modules, run `npm install` from the folder containing `package.json`. The `esbuild` version in `package.json` is already aligned with Vite 8 to avoid npm peer-dependency errors.
