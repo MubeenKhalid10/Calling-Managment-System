@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Master Database prospect record with permanent Lead ID and calling tracking metrics",
+      "type": "object",
+      "properties": {
+        "leadId": { "type": "number", "description": "Permanent unique sequential Lead ID" },
+        "clientName": { "type": "string", "description": "Prospect full name" },
+        "phoneNumber": { "type": "string", "description": "Phone number" },
+        "companyName": { "type": "string", "description": "Company or business name" },
+        "region": { "type": "string", "description": "Location or region" },
+        "position": { "type": "string", "description": "Job title or position" },
+        "designation": { "type": "string", "description": "Job title or designation" },
+        "email": { "type": "string", "description": "Email address" },
+        "personLinkedInUrl": { "type": "string", "description": "LinkedIn profile link" },
+        "campaignName": { "type": "string", "description": "Source campaign name" },
+        "responseType": { "type": "string", "description": "Response categorization" },
+        "subject": { "type": "string", "description": "Email subject" },
+        "newEmail": { "type": "string", "description": "Secondary email" },
+        "sendingStatus": { "type": "string", "description": "Email sending status" },
+        "originalEmail": { "type": "string", "description": "Original email address" },
+        "emailSent": { "type": "string", "description": "Date email was sent" },
+        "responseReceived": { "type": "string", "description": "Response received from prospect" },
+        "assignedCaller": { "type": "string", "description": "Current assigned cold caller" },
+        "currentStatus": { "type": "string", "description": "Latest call status" },
+        "lastCallDate": { "type": "string", "description": "Last call date" },
+        "nextFollowUpDate": { "type": "string", "description": "Next scheduled follow-up date" },
+        "numberOfAttempts": { "type": "number", "description": "Total call attempts made" },
+        "latestComment": { "type": "string", "description": "Latest caller comment or notes" },
+        "latestSummary": { "type": "string", "description": "Automatic 1-3 sentence summary of complete interaction journey" },
+        "rawOriginalData": { "type": "object", "description": "Untouched original imported file fields" },
+        "isDeleted": { "type": "boolean", "description": "Soft deletion flag to hide from active list while preserving reporting history" },
+        "deletedAt": { "type": "string", "description": "Timestamp when the contact was soft deleted" },
+        "createdAt": { "type": "string", "description": "Record creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["leadId", "clientName", "phoneNumber", "companyName", "currentStatus", "numberOfAttempts"]
+    },
+    "CallLog": {
+      "title": "CallLog",
+      "description": "Individual call interaction log entered during caller daily update",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique log entry ID" },
+        "date": { "type": "string", "description": "Date of call" },
+        "callerName": { "type": "string", "description": "Name of cold caller" },
+        "leadId": { "type": "number", "description": "Associated permanent Lead ID" },
+        "prospectName": { "type": "string", "description": "Prospect full name" },
+        "phoneNumber": { "type": "string", "description": "Prospect phone number" },
+        "companyName": { "type": "string", "description": "Prospect company" },
+        "status": { "type": "string", "description": "Outcome status of the call" },
+        "comment": { "type": "string", "description": "Call notes and prospect remarks" },
+        "nextFollowUpDate": { "type": "string", "description": "Agreed follow up date" },
+        "timestamp": { "type": "number", "description": "Epoch timestamp in milliseconds" }
+      },
+      "required": ["id", "date", "callerName", "leadId", "prospectName", "status", "timestamp"]
+    },
+    "Metadata": {
+      "title": "Metadata",
+      "description": "Global system configurations such as callers and statuses lists",
+      "type": "object",
+      "properties": {
+        "items": { "type": "array", "description": "Array of string values" },
+        "updatedAt": { "type": "string", "description": "Last updated ISO date string" }
+      }
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Master prospect calling database records keyed by string leadId"
+    },
+    "/callLogs/{logId}": {
+      "schema": "CallLog",
+      "description": "Audit trail entries of every call made by team members"
+    },
+    "/settings/{settingId}": {
+      "schema": "Metadata",
+      "description": "CRM settings including callers list and status options"
+    }
+  }
+}

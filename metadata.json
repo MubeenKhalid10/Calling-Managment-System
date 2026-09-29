@@ -1,0 +1,6 @@
+{
+  "name": "Calling Management System",
+  "description": "Prospect calling database management system with Master Database, Caller Daily Update sheet, Call History audit log, and Daily Activity dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
