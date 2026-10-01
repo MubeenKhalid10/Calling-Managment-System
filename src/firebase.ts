@@ -5,7 +5,13 @@ import {
   getDocFromServer,
   Firestore,
 } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged, Auth, User } from 'firebase/auth';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  Auth,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -37,10 +43,7 @@ export const db: Firestore =
 // Initialize Authentication
 export const auth: Auth = getAuth(app);
 
-// Sign in anonymously to authenticate the team session
-signInAnonymously(auth).catch((error) => {
-  console.warn('Anonymous sign-in note:', error);
-});
+export { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
 
 // Test connection as required by Firebase skill
 export async function testFirestoreConnection(): Promise<boolean> {

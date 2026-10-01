@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import {
   CallingSystemProvider,
   useCallingSystem,
@@ -22,8 +23,14 @@ import { CsvImportModal } from './components/CsvImportModal';
 import { StatusManagerModal } from './components/StatusManagerModal';
 import { SystemUsageGuideModal } from './components/SystemUsageGuideModal';
 import { Lead } from './types/crm';
+import { auth, signOut } from './firebase';
+import { AuthScreen } from './components/AuthScreen';
 
-const CallingSystemApp: React.FC = () => {
+const CallingSystemApp: React.FC<{
+  userEmail: string | null;
+  onSignOut: () => void;
+  isSigningOut: boolean;
+}> = ({ userEmail, onSignOut, isSigningOut }) => {
   const {
     leads,
     currentView,
@@ -68,6 +75,9 @@ const CallingSystemApp: React.FC = () => {
         onOpenImportModal={() => setIsImportModalOpen(true)}
         onOpenStatusModal={handleOpenCallerModal}
         onOpenGuideModal={() => setIsGuideModalOpen(true)}
+        userEmail={userEmail}
+        onSignOut={onSignOut}
+        isSigningOut={isSigningOut}
       />
 
       {/* Main Content Area */}
@@ -158,10 +168,53 @@ const CallingSystemApp: React.FC = () => {
   );
 };
 
+const AuthenticatedApp: React.FC<{ user: User }> = ({ user }) => {
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  return (
+    <div className="relative">
+      <CallingSystemApp
+        userEmail={user.email}
+        onSignOut={async () => {
+          setIsSigningOut(true);
+          await signOut(auth);
+        }}
+        isSigningOut={isSigningOut}
+      />
+    </div>
+  );
+};
+
 export default function App() {
+  return <AuthGate />;
+}
+
+const AuthGate: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    return onAuthStateChanged(auth, (nextUser) => {
+      setUser(nextUser);
+      setIsLoading(false);
+    });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center text-sm text-slate-500">
+        Checking your session...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthScreen onAuthenticated={() => undefined} />;
+  }
+
   return (
     <CallingSystemProvider>
-      <CallingSystemApp />
+      <AuthenticatedApp user={user} />
     </CallingSystemProvider>
   );
-}
+};

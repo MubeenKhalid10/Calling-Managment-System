@@ -31,6 +31,18 @@ import {
 } from 'lucide-react';
 import { exportMasterToCsv } from '../utils/csvHelper';
 
+function formatCreatedAt(dateStr: string): string {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 interface MasterDatabaseSheetProps {
   onOpenLeadModal: (lead: Lead) => void;
   onCallLeadNow: (lead: Lead) => void;
@@ -937,6 +949,7 @@ export const MasterDatabaseSheet: React.FC<MasterDatabaseSheetProps> = ({
                   </div>
                 </th>
                 <th className="py-2.5 px-3 min-w-[220px]">Latest Summary</th>
+                <th className="py-2.5 px-3 min-w-[125px] whitespace-nowrap">Added</th>
 
                 {/* Additional CSV fields (toggleable) */}
                 {showExtraCsvCols && (
@@ -959,7 +972,7 @@ export const MasterDatabaseSheet: React.FC<MasterDatabaseSheetProps> = ({
               {filteredLeads.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={showExtraCsvCols ? 17 : 13}
+                    colSpan={showExtraCsvCols ? 18 : 14}
                     className="py-12 text-center text-slate-500"
                   >
                     <div className="max-w-xs mx-auto space-y-2">
@@ -1162,6 +1175,14 @@ export const MasterDatabaseSheet: React.FC<MasterDatabaseSheetProps> = ({
                       {/* Latest Summary */}
                       <td className="py-2 px-3 text-slate-700 max-w-sm truncate" title={lead.latestSummary}>
                         {lead.latestSummary || lead.latestComment || '-'}
+                      </td>
+
+                      {/* Contact Created Date */}
+                      <td className="py-2 px-3 text-slate-600 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3 text-blue-600" />
+                          <span>{formatCreatedAt(lead.createdAt)}</span>
+                        </span>
                       </td>
 
                       {/* Additional CSV Fields */}

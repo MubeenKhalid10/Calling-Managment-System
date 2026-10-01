@@ -22,6 +22,7 @@ import {
   ChevronDown,
   User,
   Check,
+  LogOut,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -30,6 +31,9 @@ interface SidebarProps {
   onOpenImportModal: () => void;
   onOpenStatusModal: () => void;
   onOpenGuideModal: () => void;
+  userEmail: string | null;
+  onSignOut: () => void;
+  isSigningOut: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -38,6 +42,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenImportModal,
   onOpenStatusModal,
   onOpenGuideModal,
+  userEmail,
+  onSignOut,
+  isSigningOut,
 }) => {
   const {
     leads,
@@ -399,6 +406,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               v2.4
             </span>
           </div>
+
+          {/* Sign Out */}
+          <button
+            type="button"
+            onClick={onSignOut}
+            disabled={isSigningOut}
+            className="w-full inline-flex items-center gap-2 rounded-lg border border-rose-700 bg-rose-600 px-3 py-2 text-left text-xs font-semibold text-white shadow-sm transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
+            title={`Signed in as ${userEmail || 'user'}`}
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span className="min-w-0 leading-tight">
+              <span className="block">{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
+              <span className="block truncate text-[10px] font-normal text-rose-100">
+                {userEmail || 'Signed-in user'}
+              </span>
+            </span>
+          </button>
         </div>
       </aside>
 

@@ -57,6 +57,25 @@ function formatPrettyDate(dateStr: string): string {
   return dateStr;
 }
 
+function formatCreatedAt(dateStr: string): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function getLocalDateString(): string {
+  const date = new Date();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   lead,
   onClose,
@@ -93,6 +112,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
   // Add Call form states
   const [callStatus, setCallStatus] = useState<CallStatus | string>('Interested');
   const [callerName, setCallerName] = useState(callers[0] || 'Ali');
+  const [callDate, setCallDate] = useState(getLocalDateString());
   const [callComment, setCallComment] = useState('');
   const [callNextDate, setCallNextDate] = useState('');
 
@@ -123,6 +143,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
           ? 'Follow-up'
           : (lead.currentStatus as CallStatus) || 'Interested'
       );
+      setCallDate(getLocalDateString());
       setCallNextDate(lead.nextFollowUpDate || '');
       setCallComment('');
 
@@ -159,16 +180,19 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
       setModalError('Please enter a comment or call notes.');
       return;
     }
+    if (!callDate) {
+      setModalError('Please select the call or comment date.');
+      return;
+    }
 
     setIsSavingCall(true);
     setModalError(null);
     setModalSuccess(null);
 
-    const todayStr = '2026-09-24';
     const result = await submitDailyCallUpdate({
       leadId: lead.leadId,
       callerName: callerName.trim() || callers[0] || 'Ali',
-      date: todayStr,
+      date: callDate,
       status: callStatus,
       comment: callComment.trim(),
       nextFollowUpDate: callNextDate.trim(),
@@ -183,6 +207,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
 
     setModalSuccess('Call logged and recorded in call history.');
     setShowAddCallForm(false);
+    setCallDate(getLocalDateString());
     setCallComment('');
 
     setTimeout(() => {
@@ -624,7 +649,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div>
                   <label className="block text-slate-700 font-semibold mb-1">
                     Call Status <span className="text-rose-500">*</span>
@@ -659,6 +684,20 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-semibold mb-1">
+                    Call / Comment Date <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={callDate}
+                    onChange={(e) => setCallDate(e.target.value)}
+                    disabled={isSavingCall}
+                    required
+                    className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white text-slate-900 font-mono"
+                  />
                 </div>
 
                 <div>
@@ -878,6 +917,14 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({
             {lead.latestComment && lead.latestSummary && lead.latestComment !== lead.latestSummary && (
               <div className="mt-2 pt-2 border-t border-blue-100/70 text-[11px] text-slate-600">
                 <span className="font-semibold text-slate-700">Last note:</span> &ldquo;{lead.latestComment}&rdquo;
+              </div>
+            )}
+
+            {lead.createdAt && (
+              <div className="mt-3 pt-2 border-t border-blue-100/70 flex items-center gap-1.5 text-[11px] text-slate-500">
+                <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                <span className="font-semibold text-slate-700">Added:</span>
+                <span>{formatCreatedAt(lead.createdAt)}</span>
               </div>
             )}
           </div>
